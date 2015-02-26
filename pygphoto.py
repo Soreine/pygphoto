@@ -32,7 +32,6 @@ class Pygphoto(QObject):
         # files present on the camera, along with their
         self._files = {}
 
-
     def _update_file_list(self, filenames_list):
         '''Update the internal dictionnary of filenames
 
@@ -83,7 +82,6 @@ class Pygphoto(QObject):
         self._update_file_list(retval)
         return retval
 
-
     def download_file(self, filename, output_dir, overwrite=True):
         '''Download the file name 'filename' and copy it to the given path.
 
@@ -120,7 +118,6 @@ class Pygphoto(QObject):
                    '--filename', destination_path]
         return subprocess.call(command)
 
-    
     def download_files(self, filename_list, output_dir, overwrite=True):
         '''Download the whole list of files to the ouput directory
 
@@ -161,7 +158,7 @@ class Pygphoto(QObject):
                 return return_code
 
         return 0
-        
+
     def download_all(self, output_dir):
         '''Download all the files present on the camera
 
@@ -181,7 +178,6 @@ class Pygphoto(QObject):
         command.append('--force-overwrite')
         return subprocess.call(command)
 
-
     def download_all_thumbnails(self, output_dir):
         '''Download all the thumbnails for the files present on the camera
 
@@ -197,16 +193,14 @@ class Pygphoto(QObject):
         command = [Pygphoto.GPHOTO,
                    '--get-all-thumbnails',
                    '--force-overwrite',
-                   '--filename', 
+                   '--filename',
                    destination_path]
         return subprocess.call(command)
 
-
-        
 if __name__ == '__main__':
     # TESTINGS
     pygph = Pygphoto()
-    
+
     print '~~~~~~~~ _query_filename'
     filename = pygph._query_filename(1)
     print filename
