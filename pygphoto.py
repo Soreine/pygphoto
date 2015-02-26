@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 import subprocess
 import os
+import time
+import thread
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-class Pygphoto(object):
+
+class Pygphoto(QObject):
     '''Allows simple operations on a USB connected camera by interfacing
     the gphoto2 command line tool.
 
@@ -11,9 +15,17 @@ class Pygphoto(object):
     photos individually.
 
     '''
-
+    # Constants
     # Command lines string value
     GPHOTO = 'gphoto2'
+
+    # Signals
+    # This signal indicates if a camera is connected, if so it
+    # provides with the port it is connected to
+    cameraConnectionSignal = pyqtSignal(bool, str)
+
+    # When a new photo is available, give its filename
+    newPhotoSignal = pyqtSignal(str)
 
     def __init__(self):
         # _files is an internal dictionnary that associate all the
@@ -26,8 +38,9 @@ class Pygphoto(object):
 
         '''
         # Number each files, starting with 1
-        self._files = dict(zip(filenames_list, range(1,len(filenames_list) + 1)));
-    
+        self._files = dict(zip(filenames_list,
+                               range(1, len(filenames_list) + 1)))
+
     def _query_filename(self, index):
         '''Return the filename of the file indexed 'index' when listing all
         the files present on the camera
@@ -41,7 +54,7 @@ class Pygphoto(object):
 
         # The filename is the fourth word
         filename = output.split()[3]
-        # We remove the trailing simple quotes ("'") 
+        # We remove the trailing simple quotes ("'")
         return filename.strip("'")
 
     def query_file_list(self):
@@ -51,11 +64,11 @@ class Pygphoto(object):
         Raises a CalledProcessError when gphoto2 raised an error.
 
         '''
-        retval = [] # Result list of filenames
+        retval = []  # Result list of filenames
 
         # Grab the output of the list file command
-        command = [Pygphoto.GPHOTO,'--list-files']
-        output = subprocess.check_output(command) 
+        command = [Pygphoto.GPHOTO, '--list-files']
+        output = subprocess.check_output(command)
 
         # Parse the output for '#' lines
         for line in iter(output.splitlines()):
@@ -101,7 +114,9 @@ class Pygphoto(object):
                 # Do nothing
                 return 0
 
-        command = [Pygphoto.GPHOTO, '--get-file', str(index), '--filename', destination_path]
+        command = [Pygphoto.GPHOTO,
+                   '--get-file', str(index),
+                   '--filename', destination_path]
         return subprocess.call(command)
 
     
@@ -129,7 +144,9 @@ class Pygphoto(object):
             index = self._files[filename]
             # The destination is 'output_dir/filename
             destination_path = os.path.normpath(os.path.join(output_dir, filename))
-            command = [Pygphoto.GPHOTO, '--get-file', str(index), '--filename', destination_path]
+            command = [Pygphoto.GPHOTO,
+                       '--get-file', str(index),
+                       '--filename', destination_path]
             # Check that the file does not already exist
             if(os.path.exists(destination_path)):
                 if(overwrite):
