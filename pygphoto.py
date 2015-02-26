@@ -83,9 +83,10 @@ class Pygphoto(QObject):
         self._update_file_list(retval)
         return retval
 
+
     def download_file(self, filename, output_dir, overwrite=True):
         '''Download the file name 'filename' and copy it to the given path.
-        
+
         Returns 0 if succeeded. Returns 1 if the path is not an
         existing directory. Else returns the error code returned by
         gphoto.
@@ -158,7 +159,7 @@ class Pygphoto(QObject):
             return_code = subprocess.call(command)
             if(return_code != 0):
                 return return_code
-                
+
         return 0
         
     def download_all(self, output_dir):
